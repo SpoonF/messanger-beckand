@@ -1,8 +1,9 @@
 import { Router } from "../classes/Router";
 import { Express } from "express";
 import { usersController } from "../controllers/users";
+import { routers } from "./routers";
 
-export class usersRouter extends Router {
+class usersRouter extends Router {
 
     public build(app: Express): void{
         this.router.get('/:id', usersController.getUser_get);
@@ -18,3 +19,5 @@ export class usersRouter extends Router {
         return this.router;
     }
 }
+
+routers.add(new usersRouter);

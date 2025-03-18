@@ -1,9 +1,11 @@
 const config = require("../config.json");
 import express from "express";
 import WebSocket, { WebSocketServer } from "ws";
-import { usersRouter } from "./routers/users";
+import { routers } from "./routers/routers";
 
 const app = express();
+
+
 
 
 export function run() {
@@ -14,9 +16,7 @@ export function run() {
         res.send('Hello World!');
     });
 
-    const userR = new usersRouter();
-    
-    userR.build(app);
+    routers.build(app);
     
     app.listen( config.port, () => {
         console.log(`Example app listeneing on port ${ config.port }`);
