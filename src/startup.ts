@@ -2,19 +2,18 @@ const config = require("../config.json");
 import express from "express";
 import WebSocket, { WebSocketServer } from "ws";
 import { routers } from "./routers/routers";
+import cors from "cors";
 
 const app = express();
 
-
+// const CORS_OPTIONS = {
+//     origin: '*'
+// }
 
 
 export function run() {
     app.use(express.urlencoded());
-
-    app.get('/', (req, res) => {
-        res.statusCode = 200;
-        res.send('Hello World!');
-    });
+    app.use(cors())
 
     routers.build(app);
     
