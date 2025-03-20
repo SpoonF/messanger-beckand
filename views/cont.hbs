@@ -1,0 +1,149 @@
+<style>
+    #message-list {
+        display: flex;
+        flex-direction: column;
+    }
+    .message-list__item {
+        margin: 0;
+        padding: .5rem;
+        display: block;
+        border-radius: .4rem;
+    }
+    .message-list__item.myself{
+        background-color: aqua;
+        margin-left: auto;
+    }
+    .message-list__item.other{
+        background-color:aquamarine;
+        margin-right: auto;
+        
+    }
+</style>
+
+<div>
+    <div id="message-list">
+
+    </div>
+    <select name="" id="">
+
+    </select>
+
+    <input type="text" id="input-message" name="">
+    <button id="message-send">Отправить</button>
+    <input type="text" id="input-name" name="">
+</div>
+<br>
+<br>
+<br>
+<div>
+    <form id="from-register" action="/auth/registration" method="post">
+        <input name="username" type="text" placeholder="username">
+        <input name="phone" type="text" placeholder="phone">
+        <input name="password" type="password" placeholder="password">
+        <input name="age" type="date" placeholder="age">
+        <input type="submit" value="Создать">
+    </form>
+
+    <form id="from-login" action="/auth/authentication" method="post">
+        <input name="phone" type="text" placeholder="phone">
+        <input name="password" type="password" placeholder="password">
+        <input type="submit" value="Логин">
+    </form>
+    
+    <button id="get" >Получить</button>
+
+    <script>
+        const form = document.getElementById('from-register');
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const data = new URLSearchParams(new FormData(event.target));
+            console.log();
+
+
+            fetch('/auth/registration', {
+                method: "POST",
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded'
+                },
+                body: data
+            })
+            .then(response => response.json())
+            .then(console.log)
+        })
+        
+        const form_l = document.getElementById('from-login');
+        form_l.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const data = new URLSearchParams(new FormData(event.target));
+            console.log();
+
+
+            fetch('/auth/authentication', {
+                method: "POST",
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded'
+                },
+                body: data
+            })
+            .then(response => response.json())
+            .then(console.log)
+        })
+    </script>
+</div>
+
+<script>
+    let id = '';
+    class message {
+        constructor({ id, message }) {
+            this.id = id;
+            this.message = message;
+        }
+    }
+    const messageList = {
+        list: [],
+        container: document.getElementById('message-list'),
+        add: (message) =>{
+            messageList.list.push(message);
+        },
+        reload: () => {
+            let content = '';
+
+            messageList.list.forEach((element) => {
+                content += `<p class="message-list__item ${ element.id == id ? 'myself' : 'other' }">${ element.id != id ? '<span>'+element.id+'</span>' : '' }${ element.message }</p>`;
+            });
+
+            document.getElementById('message-list').innerHTML = content;
+        }
+    }
+
+    document.getElementById('get').onclick = () => {
+        console.log(document.cookie);
+    };
+
+    const ws = new WebSocket('ws://vova:3002');
+
+    ws.onerror = console.error;
+
+    ws.onmessage = (data) => {
+        messageList.add(new message(JSON.parse(data.data)));
+
+        messageList.reload();
+    }
+    let messageField = document.getElementById('input-message');
+    let messageSend = document.getElementById('message-send');
+
+    messageSend.onclick = () => {
+        ws.send(JSON.stringify({to: '', message: messageField.value}));
+
+        messageField.value = '';
+    }
+
+    const nameInput = document.getElementById('input-name');
+
+    nameInput.oninput = ({ target }) => {
+        id = target.value;
+    }
+
+</script>
