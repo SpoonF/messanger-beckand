@@ -35,6 +35,7 @@ export class authController extends Controller {
             
         }
     }
+
     public static async authentication( req: any, res: any, next: any ){
         console.log('Попытка авторизации');
         const { phone, password } = req.body;
@@ -50,9 +51,11 @@ export class authController extends Controller {
                 let options = {
                     maxAge: 1000 * 60 * 15, // would expire after 15 minutes
                     httpOnly: true, // The cookie only accessible by the web server
-                    signed: true // Indicates if the cookie should be signed
+                    path: '/',
+                    // signed: true // Indicates if the cookie should be signed
                 }
                 res.cookie('tkn',token, options);
+
                 res.statusCode = 200;
                 res.send(JSON.stringify({success: 'ok'}));
             }else{

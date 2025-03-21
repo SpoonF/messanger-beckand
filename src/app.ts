@@ -1,4 +1,4 @@
-import { run, runWebSocket } from "./startup";
+import { run } from "./startup";
 
 run();
-runWebSocket();
+// runWebSocket();

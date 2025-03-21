@@ -94,37 +94,17 @@
 </div>
 
 <script>
-    let id = '';
-    class message {
-        constructor({ id, message }) {
-            this.id = id;
-            this.message = message;
-        }
-    }
-    const messageList = {
-        list: [],
-        container: document.getElementById('message-list'),
-        add: (message) =>{
-            messageList.list.push(message);
-        },
-        reload: () => {
-            let content = '';
-
-            messageList.list.forEach((element) => {
-                content += `<p class="message-list__item ${ element.id == id ? 'myself' : 'other' }">${ element.id != id ? '<span>'+element.id+'</span>' : '' }${ element.message }</p>`;
-            });
-
-            document.getElementById('message-list').innerHTML = content;
-        }
-    }
 
     document.getElementById('get').onclick = () => {
         console.log(document.cookie);
+
     };
 
     const ws = new WebSocket('ws://vova:3002');
 
     ws.onerror = console.error;
+
+        ws.send(JSON.stringify({ type: 'info', message: 'I\'m connect' }));
 
     ws.onmessage = (data) => {
         messageList.add(new message(JSON.parse(data.data)));

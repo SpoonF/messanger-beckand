@@ -1,4 +1,4 @@
-import { SignJWT } from 'jose';
+import { JWTPayload, JWTVerifyResult, SignJWT } from 'jose';
 import { jwtVerify } from 'jose';
 import { createSecretKey, KeyObject } from 'crypto';
 const config = require("../../config.json");
@@ -16,18 +16,30 @@ export const getToken = async (object: object) => {
     .sign(secretKey); // secretKey generated from previous step
   return token;
 }
-export const getObject = async (jwt: string) => {
+export const getObject = async (jwt: string): Promise<void | JWTVerifyResult<JWTPayload>> => {
   try {
     // verify token
-    const { payload, protectedHeader } = await jwtVerify(jwt, secretKey, {
+    const result = await jwtVerify(jwt, secretKey, {
       issuer: process.env.JWT_ISSUER, // issuer
       audience: process.env.JWT_AUDIENCE, // audience
     });
     // log values to console
-    console.log(payload);
-    console.log(protectedHeader);
+    return result;
   } catch (e) {
     // token verification failed
     console.log("Token is invalid");
   }
+}
+
+export async function mv_VerifyToken(req: any, res: any, next: any) {
+  if ("tkn" in req.cookies) {
+    const result = await getObject(req.cookies.tkn);
+    if (result) {
+      req.session.user = result;
+      next();
+    } else {
+      res.status(400).send('Token is not valid');
+    }
+  }
+  res.status(400).send('Not auth');
 }
